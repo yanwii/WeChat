@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="34249c22-50d1-46c6-9989-40356eb2a900" name="Default" comment="first commit">
+    <list default="true" id="34249c22-50d1-46c6-9989-40356eb2a900" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/Login.class" afterPath="$PROJECT_DIR$/target/classes/Login.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/Request.class" afterPath="$PROJECT_DIR$/target/classes/Request.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/XiaoIce.class" afterPath="$PROJECT_DIR$/target/classes/XiaoIce.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/Login.java" afterPath="$PROJECT_DIR$/src/main/java/Login.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -290,7 +292,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1506651117936</updated>
-      <workItem from="1506651124361" duration="9745000" />
+      <workItem from="1506651124361" duration="9773000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1506666159487</created>
@@ -299,11 +301,18 @@
       <option name="project" value="LOCAL" />
       <updated>1506666159487</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="first commit">
+      <created>1506667230750</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1506667230750</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="9745000" />
+    <option name="totallyTimeSpent" value="9773000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-3" y="26" width="1372" height="746" extended-state="6" />
