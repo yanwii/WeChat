@@ -1,10 +1,3 @@
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
-
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,6 +25,7 @@ public class Login{
             System.out.println(e);
             throw new Exception("登录错误！获取二维码失败:"+e);
         }
+
 
         return isLogined;
     }
@@ -63,14 +57,12 @@ public class Login{
         System.out.println("->获取二维码");
         String uri = "https://login.weixin.qq.com/qrcode/" + uuid;
 
-        Hashtable response = this.request.get(uri);
+        Hashtable response = this.request.saveImg(uri);
 
         if (response.get("code").equals("200")){
             //保存二维码
             //显示二维码
-            String content = response.get("content").toString();
-            Document doc = Jsoup.parse(content);
-            System.out.println(doc.text());
+            System.out.println("二维码保存成功 请扫描");
         } else {
             throw new Exception(response.get("content").toString());
         }
