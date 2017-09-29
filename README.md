@@ -1,0 +1,1 @@
+# This is a java project for WeChat
