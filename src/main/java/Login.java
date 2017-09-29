@@ -1,3 +1,5 @@
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 import java.net.HttpURLConnection;
@@ -49,6 +51,7 @@ public class Login{
 
         if (match.find()){
             uuid = match.group(2);
+            System.out.println("uuid:"+uuid);
         }else {
             throw new Exception(response.get("content").toString());
         }
@@ -58,15 +61,16 @@ public class Login{
 
     private void getQR(String uuid) throws Exception{
         System.out.println("->获取二维码");
-        String uri = "https://login.weixin.qq.com/l/" + uuid;
+        String uri = "https://login.weixin.qq.com/qrcode/" + uuid;
 
         Hashtable response = this.request.get(uri);
-        System.out.println(response);
 
         if (response.get("code").equals("200")){
             //保存二维码
             //显示二维码
-
+            String content = response.get("content").toString();
+            Document doc = Jsoup.parse(content);
+            System.out.println(doc.text());
         } else {
             throw new Exception(response.get("content").toString());
         }
