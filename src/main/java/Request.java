@@ -13,10 +13,10 @@ public class Request {
         this.headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36");
     }
 
-    public Hashtable<String,String> get(String url) {
+    public Hashtable<String,String> get(String url, boolean isFollowRedirects) {
         System.setProperty ("jsse.enableSNIExtension", "false");
         try {
-            Connection.Response con = Jsoup.connect(url).headers(this.headers).ignoreContentType(true).execute();
+            Connection.Response con = Jsoup.connect(url).headers(this.headers).ignoreContentType(true).followRedirects(isFollowRedirects).execute();
             int code = con.statusCode();
             return this.mkResponse(String.valueOf(code), con.body());
         } catch (Exception e){

@@ -1,7 +1,7 @@
 import java.util.Hashtable;
 
 public class XiaoIce{
-    XiaoIce(){
+    private XiaoIce(){
     }
     public static void main(String[] args){
         Request request = new Request();
@@ -11,7 +11,7 @@ public class XiaoIce{
         try {
             login.loginProgress();
         } catch (Exception e){
-            System.out.println(e);
+            System.out.println(String.valueOf(e));
         }
     }
 
