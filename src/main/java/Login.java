@@ -1,9 +1,17 @@
+import jdk.nashorn.internal.runtime.JSONFunctions;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Login{
+class Login{
     private Request request;
+    public Hashtable<String, String> loginConfig = new Hashtable<String, String>();
+    public Hashtable<String, String> baseRequest = new Hashtable<String, String>();
     Login(Request r){
         this.request = r;
     }
@@ -15,22 +23,29 @@ public class Login{
         try{
             uuid = this.getUuid();
         } catch (Exception e){
-            System.out.println(e);
+            System.out.println(e.toString());
             throw new Exception("登录错误！获取uuid失败:"+e);
         }
 
         try{
             this.getQR(uuid);
         } catch (Exception e){
-            System.out.println(e);
+            System.out.println(e.toString());
             throw new Exception("登录错误！获取二维码失败:"+e);
         }
 
         try {
             this.checkLogin(uuid);
         } catch (Exception e){
-            System.out.println(e);
+            System.out.println(e.toString());
             throw new Exception("登录失败！:"+e);
+        }
+
+        try {
+            this.webInit();
+        } catch (Exception e){
+            System.out.println(e.toString());
+            throw new Exception("初始化失败!" + e);
         }
 
         return isLogined;
@@ -113,15 +128,54 @@ public class Login{
 
     }
 
-    private void getLoginConfig(String content){
+    private void getLoginConfig(String content) throws Exception{
+        System.out.println("->获取登录信息");
         String redirectUrl;
         Pattern pattern = Pattern.compile("window.redirect_uri=\"(.*)\";");
         Matcher match = pattern.matcher(content);
-        if (match.find()){
+        if (match.find()) {
             redirectUrl = match.group(1);
+            String url = redirectUrl.substring(0, redirectUrl.lastIndexOf("/"));
+            this.loginConfig.put("url", url);
+            this.loginConfig.put("syncUrl","https://webpush.wx.qq.com/cgi-bin/mmwebwx-bin");
+            this.loginConfig.put("firlUrl","https://file.wx.qq.com/cgi-bin/mmwebwx-bin");
+            String deviceid = String.valueOf(Math.random());
+            deviceid = "e" + deviceid.substring(2, 17);
+            this.loginConfig.put("deviceid", deviceid);
+
             Hashtable response = this.request.get(redirectUrl, false);
-            System.out.println(redirectUrl);
-            System.out.println(response);
+            if (response.get("code").equals("301")) {
+                Document doc = Jsoup.parse(response.get("content").toString());
+                String skey = doc.getElementsByTag("skey").text();
+                String wxsid = doc.getElementsByTag("wxsid").text();
+                String wxuin = doc.getElementsByTag("wxuin").text();
+                String pass_ticket = doc.getElementsByTag("pass_ticket").text();
+                this.loginConfig.put("skey", skey);
+                this.loginConfig.put("wxsid", wxsid);
+                this.loginConfig.put("wxuin", wxuin);
+                this.loginConfig.put("pass_ticket", pass_ticket);
+
+                this.baseRequest.put("Skey", skey);
+                this.baseRequest.put("Sid", wxsid);
+                this.baseRequest.put("Uin", wxuin);
+                this.baseRequest.put("DeviceID", pass_ticket);
+                System.out.println(this.loginConfig);
+                System.out.println(this.baseRequest);
+            } else {
+                throw new Exception(response.get("content").toString());
+            }
         }
+    }
+
+    private void webInit() throws Exception{
+        String url = this.loginConfig.get("url") + "/webwxinit?r=" + String.valueOf(System.currentTimeMillis()).substring(0, 10);
+        Hashtable<String, String> params = new Hashtable<String, String>();
+        Hashtable response = this.request.post(url, this.baseRequest);
+        if (response.get("code").equals("200")) {
+            System.out.println(response.get("content").toString());
+            //JSONObject jsonResponse = new JSONObject(response.get("content"));
+            //System.out.println(jsonResponse.get("SyncKet"));
+        }
+
     }
 }
