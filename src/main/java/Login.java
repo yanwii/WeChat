@@ -2,7 +2,9 @@ import jdk.nashorn.internal.runtime.JSONFunctions;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -20,8 +22,11 @@ class Login{
         // 获取uuid
         boolean isLogined = false;
         String uuid = "0";
+        //this.testPost();
+
         try{
             uuid = this.getUuid();
+            //this.webInit();
         } catch (Exception e){
             System.out.println(e.toString());
             throw new Exception("登录错误！获取uuid失败:"+e);
@@ -47,7 +52,7 @@ class Login{
             System.out.println(e.toString());
             throw new Exception("初始化失败!" + e);
         }
-
+        //this.sendMsg();
         return isLogined;
     }
 
@@ -143,7 +148,9 @@ class Login{
             deviceid = "e" + deviceid.substring(2, 17);
             this.loginConfig.put("deviceid", deviceid);
 
-            Hashtable response = this.request.get(redirectUrl, false);
+            //Hashtable response = this.request.get(redirectUrl, false);
+            Hashtable response = this.request.normalGet(redirectUrl, false);
+
             if (response.get("code").equals("301")) {
                 Document doc = Jsoup.parse(response.get("content").toString());
                 String skey = doc.getElementsByTag("skey").text();
@@ -158,7 +165,7 @@ class Login{
                 this.baseRequest.put("Skey", skey);
                 this.baseRequest.put("Sid", wxsid);
                 this.baseRequest.put("Uin", wxuin);
-                this.baseRequest.put("DeviceID", pass_ticket);
+                this.baseRequest.put("DeviceID", deviceid);
                 System.out.println(this.loginConfig);
                 System.out.println(this.baseRequest);
             } else {
@@ -168,14 +175,48 @@ class Login{
     }
 
     private void webInit() throws Exception{
-        String url = this.loginConfig.get("url") + "/webwxinit?r=" + String.valueOf(System.currentTimeMillis()).substring(0, 10);
-        Hashtable<String, String> params = new Hashtable<String, String>();
-        Hashtable response = this.request.post(url, this.baseRequest);
-        if (response.get("code").equals("200")) {
-            System.out.println(response.get("content").toString());
-            //JSONObject jsonResponse = new JSONObject(response.get("content"));
-            //System.out.println(jsonResponse.get("SyncKet"));
-        }
+        System.out.println("->初始化");
+        String url = this.loginConfig.get("url") + "/webwxinit?r=-9891412";
+        url += "&pass_ticket=" + this.loginConfig.get("pass_ticket");
+        url += "&lang=en_US";
 
+        String param = "";
+        param = "{\"BaseRequest\":" +
+                    "{"+
+                    "\"DeviceID\"" + ":" + "\"" + this.baseRequest.get("DeviceID")   +"\","+
+                    "\"Sid\""      + ":" + "\"" + this.baseRequest.get("Sid")        +"\","+
+                    "\"Skey\""     + ":" + "\"" + this.baseRequest.get("Skey")       +"\","+
+                    "\"Uin\""      + ":" + "\"" + this.baseRequest.get("Uin")        +"\""+
+                    "}" +
+                "}";
+        Hashtable response = this.request.normalPost(url, param);
+        if (response.get("code").equals("200")) {
+            JSONObject jsonResponse = new JSONObject(response.get("content").toString());
+            System.out.println(jsonResponse);
+            System.out.println("Welcome:" + jsonResponse.get("User"));
+        }else {
+            System.out.println(response.get("code"));
+            System.out.println(response.get("content"));
+        }
     }
+
+    public void sendMsg(){
+        String url = "https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsg?lang=en_US&pass_ticket=" + this.loginConfig.get("pass_ticket");
+        Hashtable<String, String> param = new Hashtable<String, String>();
+        param.put("BaseRequest", this.baseRequest.toString());
+        Hashtable<String, String> Msg = new Hashtable<String, String>();
+        Msg.put("ClientMsgId", "15075546089280900");
+        Msg.put("Content", "发誓");
+        Msg.put("FromUserName", "@e1cad587104b77593feaed6778527f3c");
+        Msg.put("LocalID", "15075546089280900");
+        Msg.put("ToUserName","@11e383b9d307c0cf202a74f70808815a5795ebab0f2367cae9d400670acaff2e");
+        Msg.put("Type", "1");
+        param.put("Msg", Msg.toString());
+        //Hashtable response = this.request.post(url, param);
+        //System.out.println(response);
+    }
+    public void testPost(){
+        String url = "http://yanwii.me/login";
+    }
+
 }
