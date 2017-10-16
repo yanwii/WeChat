@@ -1,4 +1,5 @@
 import jdk.nashorn.internal.runtime.JSONFunctions;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -6,27 +7,34 @@ import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class Login{
     private Request request;
-    public Hashtable<String, String> loginConfig = new Hashtable<String, String>();
-    public Hashtable<String, String> baseRequest = new Hashtable<String, String>();
+    private Hashtable<String, String> loginConfig = new Hashtable<String, String>();
+    private Hashtable<String, String> baseRequest = new Hashtable<String, String>();
+    private String baseRequestEntity = null;
     Login(Request r){
         this.request = r;
     }
 
-    public boolean loginProgress() throws Exception{
-        // 获取uuid
-        boolean isLogined = false;
-        String uuid = "0";
-        //this.testPost();
+    public String getBaseRequestEntity() {
+        return baseRequestEntity;
+    }
+    public Hashtable<String, String> getLoginConfig() {
+        return loginConfig;
+    }
+    public Hashtable<String, String> getBaseRequest() { return baseRequest; }
 
+    public void loginProgress() throws Exception{
+        // 获取uuid
+        boolean isLogined = true;
+        String uuid = "0";
         try{
             uuid = this.getUuid();
-            //this.webInit();
         } catch (Exception e){
             System.out.println(e.toString());
             throw new Exception("登录错误！获取uuid失败:"+e);
@@ -53,8 +61,9 @@ class Login{
             throw new Exception("初始化失败!" + e);
         }
         //this.sendMsg();
-        return isLogined;
+        System.out.println("Login succeed!\nWelcome "+this.loginConfig.get("NickName"));
     }
+
 
     private String getUuid() throws Exception{
         System.out.println("->获取uuid");
@@ -149,7 +158,7 @@ class Login{
             this.loginConfig.put("deviceid", deviceid);
 
             //Hashtable response = this.request.get(redirectUrl, false);
-            Hashtable response = this.request.normalGet(redirectUrl, false);
+            Hashtable response = this.request.normalGet(redirectUrl, false, true);
 
             if (response.get("code").equals("301")) {
                 Document doc = Jsoup.parse(response.get("content").toString());
@@ -161,6 +170,7 @@ class Login{
                 this.loginConfig.put("wxsid", wxsid);
                 this.loginConfig.put("wxuin", wxuin);
                 this.loginConfig.put("pass_ticket", pass_ticket);
+                this.loginConfig.put("deviceid", deviceid);
 
                 this.baseRequest.put("Skey", skey);
                 this.baseRequest.put("Sid", wxsid);
@@ -189,34 +199,50 @@ class Login{
                     "\"Uin\""      + ":" + "\"" + this.baseRequest.get("Uin")        +"\""+
                     "}" +
                 "}";
-        Hashtable response = this.request.normalPost(url, param);
+        //set baseRequestRequestBody
+        this.baseRequestEntity = param;
+
+        Hashtable<String, String> response = this.request.normalPost(url, param, false);
         if (response.get("code").equals("200")) {
-            JSONObject jsonResponse = new JSONObject(response.get("content").toString());
+            JSONObject jsonResponse = new JSONObject(response.get("content"));
             System.out.println(jsonResponse);
-            System.out.println("Welcome:" + jsonResponse.get("User"));
+
+            //User
+            JSONObject userJson = jsonResponse.getJSONObject("User");
+            this.loginConfig.put("UserName", userJson.getString("UserName"));
+            this.loginConfig.put("NickName", userJson.getString("NickName"));
+
+            //inviteStartCount
+            String inviteStartCount = jsonResponse.get("InviteStartCount").toString();
+            this.loginConfig.put("InviteStartCount", inviteStartCount);
+
+            //SyncKey
+            String syncKey = "";
+            JSONArray syncKeyJsonArray = jsonResponse.getJSONObject("SyncKey").getJSONArray("List");
+            Iterator iter1 = syncKeyJsonArray.iterator();
+            while (iter1.hasNext()){
+                JSONObject json = new JSONObject(iter1.next().toString());
+                syncKey += json.get("Key").toString() + "_" + json.get("Val").toString();
+                if (iter1.hasNext()){
+                    syncKey += "%7C";
+                }
+            }
+            this.loginConfig.put("synckey", syncKey);
+
+            //ContactList
+            JSONArray contactListJsonArray = jsonResponse.getJSONArray("ContactList");
+            Iterator iter2 = contactListJsonArray.iterator();
+            //while (iter2.hasNext()){
+            //    JSONObject json = new JSONObject(iter2.next().toString());
+            //    System.out.println(json);
+            //}
         }else {
             System.out.println(response.get("code"));
             System.out.println(response.get("content"));
+            throw new Exception(response.get("content"));
         }
     }
 
-    public void sendMsg(){
-        String url = "https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsg?lang=en_US&pass_ticket=" + this.loginConfig.get("pass_ticket");
-        Hashtable<String, String> param = new Hashtable<String, String>();
-        param.put("BaseRequest", this.baseRequest.toString());
-        Hashtable<String, String> Msg = new Hashtable<String, String>();
-        Msg.put("ClientMsgId", "15075546089280900");
-        Msg.put("Content", "发誓");
-        Msg.put("FromUserName", "@e1cad587104b77593feaed6778527f3c");
-        Msg.put("LocalID", "15075546089280900");
-        Msg.put("ToUserName","@11e383b9d307c0cf202a74f70808815a5795ebab0f2367cae9d400670acaff2e");
-        Msg.put("Type", "1");
-        param.put("Msg", Msg.toString());
-        //Hashtable response = this.request.post(url, param);
-        //System.out.println(response);
-    }
-    public void testPost(){
-        String url = "http://yanwii.me/login";
-    }
+
 
 }

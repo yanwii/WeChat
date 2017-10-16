@@ -1,29 +1,18 @@
 import org.apache.http.*;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 class Request {
     public Hashtable<String, String> headers = new Hashtable<String, String>();
@@ -32,6 +21,8 @@ class Request {
     Request(){
         this.headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36");
     }
+
+
 
     public Hashtable<String,String> get(String url, boolean isFollowRedirects) {
         System.setProperty ("jsse.enableSNIExtension", "false");
@@ -70,7 +61,7 @@ class Request {
         return response;
     }
 
-    public Hashtable<String, String> normalGet(String url, boolean isFollowRedirects) {
+    public Hashtable<String, String> normalGet(String url, boolean isFollowRedirects, boolean ifResetCookies) {
         try {
             System.setProperty ("jsse.enableSNIExtension", "false");
 
@@ -79,27 +70,46 @@ class Request {
             HttpGet httpGet = new HttpGet(url);
             RequestConfig requestConfig = RequestConfig.custom().setRedirectsEnabled(isFollowRedirects).build();
             httpGet.setConfig(requestConfig);
+            for (String key:this.headers.keySet()){
+                //System.out.println("Set \t"+ key + this.headers.get(key));
+                httpGet.setHeader(key, this.headers.get(key));
+            }
+
             CloseableHttpResponse response = client.execute(httpGet);
             content = EntityUtils.toString(response.getEntity(),"utf-8");
-            System.out.println("Content" + content);
-            Header[] hs = response.getHeaders("Set-Cookie");
-            String cookie = "";
-            String cookies = "";
-            for (int i=0; i<hs.length; i++){
-                cookie = hs[i].toString();
-                cookies += cookie.substring(cookie.indexOf(":")+2, cookie.indexOf(";"))+"; ";
+            //reset cookies
+            if (ifResetCookies) {
+                Header[] hs = response.getHeaders("Set-Cookie");
+                this.saveCookie(hs);
             }
-            cookies += "MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1;";
-            this.headers.put("Cookie", cookies);
-            System.out.println(this.headers);
             return this.mkResponse("301", content);
         } catch (Exception e){
             return this.mkResponse("413", e.toString());
         }
 
     }
+    private void saveCookie(Header[] header){
+        String key = null;
+        String val = null;
+        String cookie = null;
+        for (int i = 0; i < header.length; i++) {
+            cookie = header[i].toString();
+            key = cookie.substring(cookie.indexOf(":")+2, cookie.indexOf("="));
+            val = cookie.substring(cookie.indexOf("=")+1, cookie.indexOf(";"));
+            this.cookies.put(key, val);
+        }
+        this.cookies.put("MM_WX_NOTIFY_STATE", "1");
+        this.cookies.put("MM_WX_SOUND_STATE", "1");
 
-    public Hashtable<String, String> normalPost(String url, String param) {
+        String cookies = "";
+        for (String cookieKey: this.cookies.keySet()){
+            cookies += cookieKey + "= " + this.cookies.get(cookieKey) + ";";
+        }
+        this.headers.put("Cookie", cookies);
+    }
+
+
+    public Hashtable<String, String> normalPost(String url, String param, boolean ifResetCookies) {
         try {
             System.setProperty ("jsse.enableSNIExtension", "false");
             HttpPost httpPost = new HttpPost(url);
@@ -111,13 +121,17 @@ class Request {
             httpPost.setEntity(entity);
 
             for (String key:this.headers.keySet()){
-                System.out.println("Set \t"+ key + this.headers.get(key));
+                //System.out.println("Set \t"+ key + this.headers.get(key));
                 httpPost.setHeader(key, this.headers.get(key));
             }
             RequestConfig requestConfig = RequestConfig.custom().setRedirectsEnabled(true).build();
             httpPost.setConfig(requestConfig);
             CloseableHttpResponse response = client.execute(httpPost);
             String statusLine = response.getStatusLine().toString();
+            if (ifResetCookies) {
+                Header[] hs = response.getHeaders("Set-Cookie");
+                this.saveCookie(hs);
+            }
             String content = EntityUtils.toString(response.getEntity(), "utf-8");
             System.out.println(statusLine);
             client.close();
