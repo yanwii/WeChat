@@ -8,17 +8,18 @@ import java.util.HashSet;
 import java.util.Hashtable;
 
 public class Test {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Test t = new Test();
         t.main();
     }
 
-    public void main(){
-        Hashtable<String, String> param = new Hashtable<String, String>();
-        param.put("user", "yanwii");
-        JSONObject json = new JSONObject(param);
-        System.out.println(json);
+    public void main() {
+        String a = "@@ssdfsfd";
+
+        if (a.indexOf("@@")!=-1){
+            System.out.println(true);
+        }
     }
 }
-//https://webpush.wx.qq.com/cgi-bin/mmwebwx-bin/synccheck?r=1507789674230&skey=@crypt_d477b9cc_1e3bd8733bf346364fd96e517d7e720f&sid=fhzcE8homT2aPQZZ&uin=2335662880&deviceid=e321411006570309&synckey=1_658405698|2_658405729|3_658405721|1000_1507768921&_=1507789674230
-//https://webpush.wx.qq.com/cgi-bin/mmwebwx-bin/synccheck?r=1507789844241&skey=@crypt_d477b9cc_05b70b78a82340c7a843491d58500bcc&sid=%2BGGBRRc9LXhaF46u&uin=2335662880&deviceid=e502414210347888&synckey=1_658405698%7C2_658405739%7C3_658405721%7C11_658404548%7C13_658320135%7C201_1507789705%7C1000_1507768921%7C1001_1507768933&_=1507789701388
+//{"ClientMsgId":1508133752396,"FromUserName":"@cd55c7820affc2c8858e6388e8627d05","BaseRequest":{"DeviceID":"e236153385569642","Uin":"2335662880","Skey":"@crypt_d477b9cc_e33618f8b4fd9d23b7eaf3541a7ca798","Sid":"Crj6r2oUxo1rjJoy"},"ToUserName":"@cd55c7820affc2c8858e6388e8627d05","Code":3}
+//{"ClientMsgId":1508133826362,"FromUserName":"@7cdd483d15dad774497cf6a4ca07f17c","BaseRequest":{"DeviceID":"e163826447307644","Uin":2335662880,"Sid":"BZXkkxVWxfo/OH1M","Skey":"@crypt_d477b9cc_57b71e6b619b5ddc34b04fb27bf1e853"},"Code":3,"ToUserName":"@7cdd483d15dad774497cf6a4ca07f17c"}

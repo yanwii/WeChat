@@ -5,6 +5,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
+import javax.rmi.CORBA.Util;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -14,20 +15,13 @@ import java.util.regex.Pattern;
 
 class Login{
     private Request request;
-    private Hashtable<String, String> loginConfig = new Hashtable<String, String>();
-    private Hashtable<String, String> baseRequest = new Hashtable<String, String>();
-    private String baseRequestEntity = null;
+    private Config config;
+    private JSONObject loginConfig = new JSONObject();
+    private JSONObject baseRequest = new JSONObject();
     Login(Request r){
-        this.request = r;
+        this.request = Request.getInstance();
+        this.config = Config.getInstance();
     }
-
-    public String getBaseRequestEntity() {
-        return baseRequestEntity;
-    }
-    public Hashtable<String, String> getLoginConfig() {
-        return loginConfig;
-    }
-    public Hashtable<String, String> getBaseRequest() { return baseRequest; }
 
     public void loginProgress() throws Exception{
         // 获取uuid
@@ -61,6 +55,20 @@ class Login{
             throw new Exception("初始化失败!" + e);
         }
         //this.sendMsg();
+        try {
+            this.statusNotify();
+        } catch (Exception e){
+            System.out.println(e.toString());
+            throw new Exception("设置提醒失败!" + e);
+        }
+
+        try {
+            Contact contact = new Contact();
+            contact.getContact();
+        } catch (Exception e){
+            System.out.println(e.toString());
+            throw new Exception("获取联系人失败!" + e);
+        }
         System.out.println("Login succeed!\nWelcome "+this.loginConfig.get("NickName"));
     }
 
@@ -183,6 +191,10 @@ class Login{
             }
         }
     }
+    private void updateConfig(){
+        this.config.loginConfig = this.loginConfig;
+        this.config.baseRequest = this.baseRequest;
+    }
 
     private void webInit() throws Exception{
         System.out.println("->初始化");
@@ -199,8 +211,6 @@ class Login{
                     "\"Uin\""      + ":" + "\"" + this.baseRequest.get("Uin")        +"\""+
                     "}" +
                 "}";
-        //set baseRequestRequestBody
-        this.baseRequestEntity = param;
 
         Hashtable<String, String> response = this.request.normalPost(url, param, false);
         if (response.get("code").equals("200")) {
@@ -228,7 +238,7 @@ class Login{
                 }
             }
             this.loginConfig.put("synckey", syncKey);
-
+            this.updateConfig();
             //ContactList
             JSONArray contactListJsonArray = jsonResponse.getJSONArray("ContactList");
             Iterator iter2 = contactListJsonArray.iterator();
@@ -242,7 +252,20 @@ class Login{
             throw new Exception(response.get("content"));
         }
     }
+    private void statusNotify(){
+        System.out.println("->推送");
+        JSONObject param = new JSONObject();
+        param.put("BaseRequest", this.baseRequest);
+        param.put("Code", 3);
+        param.put("FromUserName", this.loginConfig.get("UserName"));
+        param.put("ToUserName", this.loginConfig.get("UserName"));
+        param.put("ClientMsgId", System.currentTimeMillis());
 
-
+        String url = this.loginConfig.get("url")
+                + "/webwxstatusnotify?lang=zh_CN&pass_ticket="
+                + this.loginConfig.get("pass_ticket");
+        Hashtable response = this.request.normalPost(url, param.toString(), false);
+        System.out.println(response);
+    }
 
 }

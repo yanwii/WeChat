@@ -11,9 +11,11 @@ import java.util.regex.Pattern;
 class Receiving {
     private Login login;
     private Request request;
-    Receiving(Login l, Request r){
+    private Config config;
+    Receiving(Login l){
         this.login = l;
-        this.request = r;
+        this.request = Request.getInstance();
+        this.config = Config.getInstance();
     }
     public void start(){
         String syncStatus = null;
@@ -36,7 +38,8 @@ class Receiving {
     private String syncCheck() {
         try {
             String result = null;
-            Hashtable loginConfig = this.login.getLoginConfig();
+            JSONObject loginConfig = this.config.loginConfig;
+
             String url = loginConfig.get("syncUrl") + "/synccheck";
             String param =  "?r=" + System.currentTimeMillis() +
                             "&skey=" + loginConfig.get("skey") +
@@ -67,14 +70,14 @@ class Receiving {
     }
 
     private void getMsg(){
-        Hashtable loginConfig = this.login.getLoginConfig();
+        JSONObject loginConfig = this.config.loginConfig;
         String url = loginConfig.get("syncUrl") + "/webwxsync";
         JSONObject jsonParam = new JSONObject();
         jsonParam.put("SyncKey", loginConfig.get("synckey"));
         String rr = String.valueOf(System.currentTimeMillis());
         rr = "-" + rr;
         jsonParam.put("rr", rr);
-        jsonParam.put("BaseRequest", this.login.getBaseRequest());
+        jsonParam.put("BaseRequest", this.config.baseRequest);
         Hashtable<String, String> response = this.request.normalPost(url, jsonParam.toString(), true);
         System.out.println(response);
     }

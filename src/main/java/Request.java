@@ -1,3 +1,4 @@
+import com.sun.org.apache.regexp.internal.RE;
 import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -15,6 +16,13 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 
 class Request {
+    public static Request instance=null;
+    public static Request getInstance(){
+        if (instance==null){
+            instance = new Request();
+        }
+        return instance;
+    }
     public Hashtable<String, String> headers = new Hashtable<String, String>();
     public String baseUrl = "http://login.weixin.qq.com";
     private LinkedHashMap<String, String> cookies = new LinkedHashMap<String, String>();
@@ -111,6 +119,11 @@ class Request {
 
     public Hashtable<String, String> normalPost(String url, String param, boolean ifResetCookies) {
         try {
+            System.out.println("------------------------------------");
+            System.out.println("post->" + url);
+            System.out.println(param);
+            System.out.println("------------------------------------");
+
             System.setProperty ("jsse.enableSNIExtension", "false");
             HttpPost httpPost = new HttpPost(url);
             CloseableHttpClient client = HttpClients.createDefault();
@@ -133,7 +146,6 @@ class Request {
                 this.saveCookie(hs);
             }
             String content = EntityUtils.toString(response.getEntity(), "utf-8");
-            System.out.println(statusLine);
             client.close();
             Header[] hd = response.getAllHeaders();
             return this.mkResponse("200", content);

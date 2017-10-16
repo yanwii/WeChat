@@ -6,7 +6,7 @@ public class XiaoIce{
     public static void main(String[] args){
         Request request = new Request();
         XiaoIce xi = new XiaoIce();
-
+        boolean islogined = false;
         //login
         Login login = new Login(request);
         try {
@@ -14,13 +14,14 @@ public class XiaoIce{
         } catch (Exception e){
             System.out.println(e.toString());
         }
-
-        //start monitoring
-        Receiving recerving = new Receiving(login, request);
-        try {
-            recerving.start();
-        }catch (Exception e){
-            System.out.println(e.toString());
+        if (islogined) {
+            //start monitoring
+            Receiving recerving = new Receiving(login);
+            try {
+                recerving.start();
+            } catch (Exception e) {
+                System.out.println(e.toString());
+            }
         }
     }
 
