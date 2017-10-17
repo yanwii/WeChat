@@ -21,5 +21,6 @@ public class Test {
         }
     }
 }
-//{"ClientMsgId":1508133752396,"FromUserName":"@cd55c7820affc2c8858e6388e8627d05","BaseRequest":{"DeviceID":"e236153385569642","Uin":"2335662880","Skey":"@crypt_d477b9cc_e33618f8b4fd9d23b7eaf3541a7ca798","Sid":"Crj6r2oUxo1rjJoy"},"ToUserName":"@cd55c7820affc2c8858e6388e8627d05","Code":3}
-//{"ClientMsgId":1508133826362,"FromUserName":"@7cdd483d15dad774497cf6a4ca07f17c","BaseRequest":{"DeviceID":"e163826447307644","Uin":2335662880,"Sid":"BZXkkxVWxfo/OH1M","Skey":"@crypt_d477b9cc_57b71e6b619b5ddc34b04fb27bf1e853"},"Code":3,"ToUserName":"@7cdd483d15dad774497cf6a4ca07f17c"}
+
+//{"BaseRequest":{"Uin":2335662880,"Sid":"QA2fBUJzCRQkd9tP","Skey":"@crypt_d477b9cc_e606ecb0e87e84745e235a9569eababf","DeviceID":"e655098565555246"},"SyncKey":{"Count":4,"List":[{"Key":1,"Val":658406674},{"Key":2,"Val":658406790},{"Key":3,"Val":658406717},{"Key":1000,"Val":1508200322}]},"rr":-694178901}
+//{"rr":"-1508229176112","BaseRequest":{"DeviceID":"e344431451388271","Skey":"@crypt_d477b9cc_98ed870a44f743d100d122491897b4d8","Uin":"2335662880","Sid":"cMtkX2tU7DlCM0zt"},"SyncKey":[{"Val":658406674,"Key":1},{"Val":658406800,"Key":2},{"Val":658406717,"Key":3},{"Val":1508200322,"Key":1000}]}

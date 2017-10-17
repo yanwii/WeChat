@@ -237,6 +237,7 @@ class Login{
                     syncKey += "%7C";
                 }
             }
+            this.loginConfig.put("Synckey", jsonResponse.getJSONObject("SyncKey"));
             this.loginConfig.put("synckey", syncKey);
             this.updateConfig();
             //ContactList
