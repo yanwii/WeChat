@@ -25,6 +25,7 @@ class Receiving {
                 System.out.println(syncStatus);
                 if (syncStatus.equals("2")){
                     this.getMsg();
+                    break;
                 }
                 Thread.sleep(2);
             }
@@ -36,6 +37,7 @@ class Receiving {
 
 
     private String syncCheck() {
+        System.out.println("->SyncCheck");
         try {
             String result = null;
             JSONObject loginConfig = this.config.loginConfig;
@@ -70,10 +72,14 @@ class Receiving {
     }
 
     private void getMsg(){
-        JSONObject loginConfig = this.config.loginConfig;
-        String url = loginConfig.get("syncUrl") + "/webwxsync";
+        System.out.println("->GetMsg");
+        String url = this.config.loginConfig.get("url") + "/webwxsync";
+        url += "?sid=" + this.config.loginConfig.get("wxsid") +
+                "&skey=" + this.config.loginConfig.get("skey") +
+                "&pass_ticket=" + this.config.loginConfig.get("pass_ticket");
+
         JSONObject jsonParam = new JSONObject();
-        jsonParam.put("SyncKey", loginConfig.get("synckey"));
+        jsonParam.put("SyncKey", this.config.loginConfig.get("synckey"));
         String rr = String.valueOf(System.currentTimeMillis());
         rr = "-" + rr;
         jsonParam.put("rr", rr);

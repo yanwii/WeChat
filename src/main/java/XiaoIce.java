@@ -14,6 +14,7 @@ public class XiaoIce{
         } catch (Exception e){
             System.out.println(e.toString());
         }
+        islogined = true;
         if (islogined) {
             //start monitoring
             Receiving recerving = new Receiving(login);

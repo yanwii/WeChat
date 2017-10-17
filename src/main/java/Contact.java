@@ -40,18 +40,21 @@ public class Contact {
         System.out.println("共有 "+ friends.length() + " 个好友");
         System.out.println("共有 "+ chatroomsList.length() + " 个聊天");
 
+        updateLocalFriends(friends);
+        updateLocalChatrooms(chatroomsList);
     }
 
     public void updateLocalFriends(JSONArray friends){
+
         Iterator iterator = friends.iterator();
-        if (iterator.hasNext()){
-            JSONObject tmp = new JSONObject(iterator.next());
-            this.config.friends.put("NickName", tmp);
+        while (iterator.hasNext()){
+            JSONObject tmp = new JSONObject(iterator.next().toString());
+            this.config.friends.put(tmp.get("NickName").toString(), tmp);
         }
     }
     public void updateLocalChatrooms(JSONArray chatrooms){
         Iterator iterator = chatrooms.iterator();
-        if (iterator.hasNext()){
+        while (iterator.hasNext()){
             JSONObject tmp = new JSONObject(iterator.next());
             this.config.chatrooms.put("NickName", tmp);
         }
