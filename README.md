@@ -1,1 +1,1 @@
-# This is a java project for WeChat
+# 微信聊天Java版本

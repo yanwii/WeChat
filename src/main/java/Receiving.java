@@ -14,7 +14,6 @@ class Receiving {
     private Login login;
     private Request request;
     private Config config;
-    private JSONArray msgList = new JSONArray();
     Receiving(Login l){
         this.login = l;
         this.request = Request.getInstance();
@@ -26,18 +25,16 @@ class Receiving {
         try {
             while (true) {
                 syncStatus = this.syncCheck();
-                System.out.println(syncStatus);
                 if (syncStatus.equals("2")){
                     response = this.getMsg();
                     if (!response.getJSONObject("BaseResponse").get("Ret").toString().equals("0")) {
-                        break;
+                        throw new Exception("同步失败!");
                     }
                     JSONArray modContactList = response.getJSONArray("ModContactList");
                     JSONArray addMsgCount = response.getJSONArray("AddMsgList");
                     if (addMsgCount.iterator().hasNext()){
                         produceMsg(addMsgCount);
                     }
-                    System.out.println(msgList.toString());
                 }
                 Thread.sleep(3000);
             }
@@ -67,7 +64,6 @@ class Receiving {
             String content = response.get("content").toString();
             Pattern pattern = Pattern.compile("window.synccheck=\\{retcode:\"(\\d+)\",selector:\"(\\d+)\"\\}");
             Matcher matcher = pattern.matcher(content);
-            System.out.println(content);
             if (matcher.find()) {
                 if (matcher.group(1).equals("1101")) {
                     throw new Exception(content);
@@ -117,9 +113,9 @@ class Receiving {
 
     public void  produceMsg(JSONArray addMsgList){
         Iterator iterator = addMsgList.iterator();
+        JSONArray msgList = new JSONArray();
         while (iterator.hasNext()){
             JSONObject tmp = new JSONObject(iterator.next().toString());
-            JSONArray msgList = new JSONArray();
             int msgType = Integer.parseInt(tmp.get("MsgType").toString());
             switch (msgType){
                 case 1:
@@ -128,14 +124,17 @@ class Receiving {
                 case 51:
                     //phone init
             }
-            System.out.println(msgList.toString());
         }
+        System.out.println(msgList.toString());
     }
     public JSONObject getText(JSONObject json){
         JSONObject r = new JSONObject();
         if (json.get("Url").equals("")){
+            System.out.println(json);
             r.put("Type", "Text");
             r.put("Text", json.get("Content"));
+            r.put("FromUserName", json.get("FromUserName"));
+            r.put("ToUserName", json.get("ToUserName"));
         }
         return r;
     }
