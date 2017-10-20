@@ -5,16 +5,16 @@ public class XiaoIce{
     }
     public static void main(String[] args){
         Request request = new Request();
-        XiaoIce xi = new XiaoIce();
-        boolean islogined = false;
+        boolean islogined = true;
+
         //login
         Login login = new Login(request);
         try {
             login.loginProgress();
         } catch (Exception e){
+            islogined = false;
             System.out.println(e.toString());
         }
-        islogined = true;
         if (islogined) {
             //start monitoring
             Receiving recerving = new Receiving(login);

@@ -45,11 +45,12 @@ public class Contact {
     }
 
     public void updateLocalFriends(JSONArray friends){
-
         Iterator iterator = friends.iterator();
         while (iterator.hasNext()){
             JSONObject tmp = new JSONObject(iterator.next().toString());
             this.config.friends.put(tmp.get("NickName").toString(), tmp);
+            this.config.nicknameToUsername.put(tmp.get("NickName").toString(), tmp.get("UserName").toString());
+            this.config.usernameToNickname.put(tmp.get("UserName").toString(), tmp.get("NickName").toString());
         }
     }
     public void updateLocalChatrooms(JSONArray chatrooms){

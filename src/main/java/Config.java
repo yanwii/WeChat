@@ -12,6 +12,8 @@ class Config {
     public JSONObject friends = new JSONObject();
     public JSONObject loginConfig = new JSONObject();
     public JSONObject baseRequest = new JSONObject();
+    public JSONObject nicknameToUsername = new JSONObject();
+    public JSONObject usernameToNickname = new JSONObject();
 
 }
 

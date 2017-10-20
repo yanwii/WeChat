@@ -1,10 +1,7 @@
 import com.sun.org.apache.regexp.internal.RE;
-import jdk.nashorn.api.scripting.JSObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
-import java.net.URLEncoder;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.regex.Matcher;
@@ -12,12 +9,11 @@ import java.util.regex.Pattern;
 
 class Receiving {
     private Login login;
-    private Request request;
-    private Config config;
+    private Request request = Request.getInstance();
+    private Config config = Config.getInstance();
+    private Message message = Message.getInstance();
     Receiving(Login l){
         this.login = l;
-        this.request = Request.getInstance();
-        this.config = Config.getInstance();
     }
     public void start(){
         String syncStatus = null;
@@ -32,16 +28,19 @@ class Receiving {
                     }
                     JSONArray modContactList = response.getJSONArray("ModContactList");
                     JSONArray addMsgCount = response.getJSONArray("AddMsgList");
+                    //produceMsg
                     if (addMsgCount.iterator().hasNext()){
-                        produceMsg(addMsgCount);
+                        this.message.produceMsg(addMsgCount);
                     }
+                    this.message.sendMsg("哈哈哈哈", "sssss");
+                } else if (syncStatus.equals("1101")){
+                    throw new Exception("同步失败");
                 }
                 Thread.sleep(3000);
             }
         } catch (Exception e){
             System.out.println(e.toString());
         }
-        //this.getMsg();
     }
 
 
@@ -65,10 +64,8 @@ class Receiving {
             Pattern pattern = Pattern.compile("window.synccheck=\\{retcode:\"(\\d+)\",selector:\"(\\d+)\"\\}");
             Matcher matcher = pattern.matcher(content);
             if (matcher.find()) {
-                if (matcher.group(1).equals("1101")) {
-                    throw new Exception(content);
-                } else if(!matcher.group(1).equals("0")){
-                    result = "None";
+                if(!matcher.group(1).equals("0")){
+                    result = "1101";
                 } else {
                     result = matcher.group(2);
                 }
@@ -111,31 +108,5 @@ class Receiving {
         return responseJson;
     }
 
-    public void  produceMsg(JSONArray addMsgList){
-        Iterator iterator = addMsgList.iterator();
-        JSONArray msgList = new JSONArray();
-        while (iterator.hasNext()){
-            JSONObject tmp = new JSONObject(iterator.next().toString());
-            int msgType = Integer.parseInt(tmp.get("MsgType").toString());
-            switch (msgType){
-                case 1:
-                    // words
-                    msgList.put(getText(tmp));
-                case 51:
-                    //phone init
-            }
-        }
-        System.out.println(msgList.toString());
-    }
-    public JSONObject getText(JSONObject json){
-        JSONObject r = new JSONObject();
-        if (json.get("Url").equals("")){
-            System.out.println(json);
-            r.put("Type", "Text");
-            r.put("Text", json.get("Content"));
-            r.put("FromUserName", json.get("FromUserName"));
-            r.put("ToUserName", json.get("ToUserName"));
-        }
-        return r;
-    }
+
 }

@@ -23,6 +23,7 @@ class Request {
         }
         return instance;
     }
+    public ProcessLog plog = ProcessLog.getInstance();
     public Hashtable<String, String> headers = new Hashtable<String, String>();
     public String baseUrl = "http://login.weixin.qq.com";
     private LinkedHashMap<String, String> cookies = new LinkedHashMap<String, String>();
@@ -72,7 +73,7 @@ class Request {
     public Hashtable<String, String> normalGet(String url, boolean isFollowRedirects, boolean ifResetCookies) {
         try {
             System.setProperty ("jsse.enableSNIExtension", "false");
-
+            this.plog.requestLogger.info("Get: " + url);
             String content = "";
             CloseableHttpClient client = HttpClients.createDefault();
             HttpGet httpGet = new HttpGet(url);
@@ -119,10 +120,11 @@ class Request {
 
     public Hashtable<String, String> normalPost(String url, String param, boolean ifResetCookies) {
         try {
-            System.out.println("------------------------------------");
-            System.out.println("post->" + url);
-            System.out.println(param);
-            System.out.println("------------------------------------");
+            //System.out.println("------------------------------------");
+            //System.out.println("post->" + url);
+            //System.out.println(param);
+            //System.out.println("------------------------------------");
+            this.plog.requestLogger.info("Post: " + url + " param: " + param);
 
             System.setProperty ("jsse.enableSNIExtension", "false");
             HttpPost httpPost = new HttpPost(url);
