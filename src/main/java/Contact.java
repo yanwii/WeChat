@@ -45,6 +45,7 @@ public class Contact {
     }
 
     public void updateLocalFriends(JSONArray friends){
+        System.out.println(friends);
         Iterator iterator = friends.iterator();
         while (iterator.hasNext()){
             JSONObject tmp = new JSONObject(iterator.next().toString());

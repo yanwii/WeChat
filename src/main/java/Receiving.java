@@ -32,7 +32,8 @@ class Receiving {
                     if (addMsgCount.iterator().hasNext()){
                         this.message.produceMsg(addMsgCount);
                     }
-                    this.message.sendMsg("哈哈哈哈", "sssss");
+                    //this.message.sendMsg("哈哈哈哈", "sssss");
+                    this.message.sentMsgViaNickname("哈哈哈", "Yvvxgz");
                 } else if (syncStatus.equals("1101")){
                     throw new Exception("同步失败");
                 }

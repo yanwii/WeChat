@@ -70,6 +70,9 @@ public class Message {
             //" Response:" + jsonResponse.toString());
         }
     }
-
+    public void sentMsgViaNickname(String content, String nickname){
+        String toUserName = this.config.nicknameToUsername.getJSONObject(nickname).getJSONObject("UserName").toString();
+        sendMsg(content, toUserName);
+    }
 
 }
