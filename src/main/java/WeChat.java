@@ -1,7 +1,7 @@
 import java.util.Hashtable;
 
-public class XiaoIce{
-    private XiaoIce(){
+public class WeChat{
+    private WeChat(){
     }
     public static void main(String[] args){
         Request request = new Request();

@@ -1,21 +1,8 @@
-Oct 20, 2017 5:34:52 PM Login getUuid
+Nov 01, 2017 10:47:23 AM Login getUuid
 INFO: ->获取uuid
-Oct 20, 2017 5:35:07 PM Login getQR
+Nov 01, 2017 10:47:39 AM Login getQR
 INFO: 获取二维码
-Oct 20, 2017 5:35:08 PM Login getQR
+Nov 01, 2017 10:47:42 AM Login getQR
 INFO: 二维码保存成功 请扫描
-Oct 20, 2017 5:35:08 PM Login checkLogin
+Nov 01, 2017 10:47:42 AM Login checkLogin
 INFO: 检查登录状态
-Oct 20, 2017 5:35:49 PM Login checkLogin
-INFO: 已扫描，请在手机上确认！
-Oct 20, 2017 5:35:51 PM Login checkLogin
-INFO: 已确认，登录成功
-Oct 20, 2017 5:35:51 PM Login getLoginConfig
-INFO: 获取登录信息
-Oct 20, 2017 5:35:57 PM Login webInit
-INFO: 初始化
-Oct 20, 2017 5:35:57 PM Login statusNotify
-INFO: 设置推送
-Oct 20, 2017 5:35:59 PM Login loginProgress
-FINEST: Login succeed!
-Welcome Lr
